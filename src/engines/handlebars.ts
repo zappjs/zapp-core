@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as Case from 'case';
 import Handlebars from 'handlebars';
-import uuidv5 from 'uuid/v5';
+import * as uuidv5 from 'uuid/v5';
 
 function getType(val) {
   if (val === undefined) {

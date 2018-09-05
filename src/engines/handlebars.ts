@@ -754,6 +754,9 @@ const swiftValues = {
     byTruncatingTail: '.byTruncatingTail',
     byWordWrapping: '.byWordWrapping'
   },
+  contentVerticalAlignment: (name, value, type, suffix) => {
+    return `${name}${suffix}.contentVerticalAlignment = .${value}`;
+  },
   constraints: (name, values, type, suffix, parentView) => {
     let result = `${name}${suffix}.translatesAutoresizingMaskIntoConstraints = false\n`;
     const keys = Object.keys(values);
@@ -786,6 +789,9 @@ const swiftValues = {
     return `${name}${suffix}.frame = CGRect(x: ${value.x || '0.0'}, y: ${value.y || '0.0'}, width: ${value.width || '0.0'}, height: ${value.height || '0.0'})`;
   },
   image: (name, value, type, suffix) => {
+    if (type === 'button') {
+      return `${name}${suffix}.setImage(UIImage(named: "${value}"), for: .normal)`;
+    }
     return `${name}${suffix}.image = UIImage(named: "${value}")`;
   },
   layer: (name, value, type, suffix, parentView) => {
@@ -817,6 +823,9 @@ const swiftValues = {
       result += `${name}${suffix}.register(${value[id]}.self, forCellWithReuseIdentifier: "${id}")`;
     });
     return result;
+  },
+  separatorStyle: (name, value, type, suffix) => {
+    return `${name}${suffix}.separatorStyle = .${value}`;
   },
   startAnimating: (name, value, type, suffix) => {
     return `${name}${suffix}.startAnimating()`;

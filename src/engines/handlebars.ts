@@ -754,6 +754,20 @@ const swiftValues = {
     byTruncatingTail: '.byTruncatingTail',
     byWordWrapping: '.byWordWrapping'
   },
+  collectionView: (name, value, type, suffix) => {
+    if (value.layout) {
+      let result = `let ${name}${suffix}Layout = UICollectionViewFlowLayout()\n`;
+      if (value.layout.scrollDirection) {
+        result += `${name}${suffix}Layout.scrollDirection = .${value.layout.scrollDirection}\n`;
+      }
+      if (value.layout.itemSize) {
+        result += `${name}${suffix}Layout.itemSize = CGSize(width: ${value.layout.itemSize.width}, height: ${value.layout.itemSize.height})\n`;
+      }
+      result += `${name}${suffix}.collectionViewLayout = ${name}${suffix}Layout`;
+      return result;
+    }
+    return false;
+  },
   contentVerticalAlignment: (name, value, type, suffix) => {
     return `${name}${suffix}.contentVerticalAlignment = .${value}`;
   },
@@ -891,7 +905,7 @@ function swiftCreateHelper(name, values, type = 'view', suffix = '', parentView 
   }
   let swiftInit = '';
   if (type === 'collectionView') {
-    swiftInit = `frame: self.view.frame, collectionViewLayout: ColumnFlowLayout(cellsPerRow: ${values.cellsPerRow ? values.cellsPerRow : '1'})`;
+    swiftInit = `frame: ${parentView}.frame, collectionViewLayout: UICollectionViewFlowLayout()`;
   } else if (type === 'pageView') {
     swiftInit = 'transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil';
   } else if (type === 'tableView') {
@@ -900,7 +914,8 @@ function swiftCreateHelper(name, values, type = 'view', suffix = '', parentView 
   const controllerSuffix = isController ? 'Controller' : '';
   const viewSuffix = isController ? 'Controller.view' : '';
   const viewName = `${name}${suffix}${viewSuffix}`;
-  let swiftValue = `\n${name}${suffix}${controllerSuffix} = UI${caseHelper(type, 'pascal')}${controllerSuffix}(${swiftInit})`;
+  const swiftType = type === 'wkWebView' ? 'WKWebView' : `UI${caseHelper(type, 'pascal')}${controllerSuffix}`;
+  let swiftValue = `\n${name}${suffix}${controllerSuffix} = ${swiftType}(${swiftInit})`;
   swiftValue += `\n${parentView}.addSubview(${viewName})`;
   if (values.subviews) {
     Object.keys(values.subviews).forEach((subviewKey) => {
@@ -999,7 +1014,8 @@ function swiftPropertiesHelper(name, values, type = 'view', suffix = '', isContr
   const controllerSuffix = isController ? 'Controller' : '';
   const viewSuffix = isController ? 'Controller.view' : '';
   const viewName = `${name}${suffix}${viewSuffix}`;
-  let swiftProperties = `var ${name}${suffix}${controllerSuffix}: UI${caseHelper(type, 'pascal')}${controllerSuffix}!`;
+  const swiftType = type === 'wkWebView' ? 'WKWebView' : `UI${caseHelper(type, 'pascal')}${controllerSuffix}`;
+  let swiftProperties = `var ${name}${suffix}${controllerSuffix}: ${swiftType}!`;
   if (values.subviews) {
     swiftProperties += '\n';
     Object.keys(values.subviews).forEach((subviewKey) => {

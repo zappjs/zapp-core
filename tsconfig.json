@@ -3,7 +3,11 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "./lib",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "lib": [
+      "dom",
+      "es2017"
+    ]
   },
   "exclude": [
     "test"

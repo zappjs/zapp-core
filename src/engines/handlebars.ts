@@ -64,12 +64,19 @@ export default function engine(specs, template) {
   Handlebars.registerHelper('eqAll', eqAllHelper);
   Handlebars.registerHelper('eqAny', eqAnyHelper);
   Handlebars.registerHelper('every', everyHelper);
+  Handlebars.registerHelper('gt', gtHelper);
+  Handlebars.registerHelper('gte', gteHelper);
   Handlebars.registerHelper('hasParams', hasParamsHelper);
   Handlebars.registerHelper('hash', hashHelper);
   Handlebars.registerHelper('import', importHelper);
+  Handlebars.registerHelper('includes', includesHelper);
   Handlebars.registerHelper('indent', indentHelper);
   Handlebars.registerHelper('json', jsonHelper);
   Handlebars.registerHelper('jsx', jsxHelper);
+  Handlebars.registerHelper('keys', keysHelper);
+  Handlebars.registerHelper('length', lengthHelper);
+  Handlebars.registerHelper('lt', ltHelper);
+  Handlebars.registerHelper('lte', lteHelper);
   Handlebars.registerHelper('ne', neHelper);
   Handlebars.registerHelper('neAll', neAllHelper);
   Handlebars.registerHelper('neAny', neAnyHelper);
@@ -144,9 +151,9 @@ function constantHelper(name, allConstants, pathName, opts) {
 
 function eqHelper(a, b, opts) {
   if (a === b) {
-    return opts.fn(this);
+    return opts && opts.fn ? opts.fn(this) : true;
   }
-  return opts.inverse(this);
+  return opts && opts.inverse ? opts.inverse(this) : false;
 }
 
 function eqAllHelper() {
@@ -191,6 +198,22 @@ function everyHelper() {
   }
 }
 
+function gtHelper(num1, num2, opts) {
+  if (num1 > num2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+}
+
+function gteHelper(num1, num2, opts) {
+  if (num1 >= num2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+}
+
 function hashHelper() {
   const values = Array.prototype.slice
     .call(arguments)
@@ -217,6 +240,18 @@ function importHelper(name, allImports, pathName, opts) {
     module: moduleName
   };
   return opts.fn(params);
+}
+
+function includesHelper(value: (string | any[]), match: (string | any), opts) {
+  if (
+    (typeof value === 'string' && value.includes(match))
+    ||
+    (Array.isArray(value) && value.includes(match))
+  ) {
+    return opts && opts.fn ? opts.fn(this) : true;
+  } else {
+    return opts && opts.inverse ? opts.inverse(this) : false;
+  }
 }
 
 function indent(indention, added = 0) {
@@ -605,6 +640,30 @@ function jsxHelper(elements, indentionStart, additionalAttributes = []) {
   }
   const rendered = (render(elements, indentionStart, 0) || '').replace(/\n$/, '');
   return rendered;
+}
+
+function keysHelper(object) {
+  return Object.keys(object);
+}
+
+function lengthHelper(value) {
+  return value.length;
+}
+
+function ltHelper(num1, num2, opts) {
+  if (num1 < num2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
+}
+
+function lteHelper(num1, num2, opts) {
+  if (num1 <= num2) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
+  }
 }
 
 function neHelper(a, b, opts) {

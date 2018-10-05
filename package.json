@@ -20,8 +20,8 @@
     "uuid": "^3.3.2"
   },
   "scripts": {
-    "build": "mkdir lib ; mkdir lib/zapp ; ./node_modules/.bin/babel src -d lib",
+    "build": "tsc",
     "test": "./node_modules/.bin/mocha --require babel-core/register 'test/**/*.test.js'",
-    "watch": "mkdir lib ; mkdir lib/bin ; mkdir lib/zapp ; ./node_modules/.bin/babel src -w -d lib"
+    "watch": "tsc -w"
   }
 }

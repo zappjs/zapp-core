@@ -64,8 +64,10 @@ export default function engine(specs, template) {
   Handlebars.registerHelper('eqAll', eqAllHelper);
   Handlebars.registerHelper('eqAny', eqAnyHelper);
   Handlebars.registerHelper('every', everyHelper);
+  Handlebars.registerHelper('get', getHelper);
   Handlebars.registerHelper('gt', gtHelper);
   Handlebars.registerHelper('gte', gteHelper);
+  Handlebars.registerHelper('has', hasHelper);
   Handlebars.registerHelper('hasParams', hasParamsHelper);
   Handlebars.registerHelper('hash', hashHelper);
   Handlebars.registerHelper('import', importHelper);
@@ -198,6 +200,10 @@ function everyHelper() {
   }
 }
 
+function getHelper(obj, key) {
+  return obj[key];
+}
+
 function gtHelper(num1, num2, opts) {
   if (num1 > num2) {
     return opts.fn(this);
@@ -212,6 +218,13 @@ function gteHelper(num1, num2, opts) {
   } else {
     return opts.inverse(this);
   }
+}
+
+function hasHelper(obj, key, opts) {
+  if (typeof obj === 'object' && obj[key] !== undefined) {
+    return opts.fn(this);
+  }
+  return opts.inverse(this);
 }
 
 function hashHelper() {

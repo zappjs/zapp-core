@@ -8,46 +8,7 @@ import json from './engines/json';
 import plist from './engines/plist';
 import yaml from './engines/yaml';
 
-const inputSchema = {
-  type: 'object',
-  properties: {
-    encoder: {
-      type: 'string'
-    },
-    engine: {
-      required: true,
-      type: 'string'
-    },
-    filename: {
-      type: ['object', 'string'],
-      properties: {
-        engine: {
-          type: 'string'
-        },
-        mapping: {
-          type: ['object', 'string']
-        },
-        template: {
-          type: 'string'
-        }
-      }
-    },
-    iterator: {
-      type: 'string'
-    },
-    mapping: {
-      type: ['object', 'string']
-    },
-    schema: {
-      type: ['object', 'string']
-    },
-    template: {
-      type: 'string'
-    }
-  }
-};
-
-function getMappedSpecs(mappingConfig = {}, specs, specName, specsSlice) {
+function getMappedSpecs(mappingConfig = {}, specs, specName?, specsSlice?) {
   if (typeof mappingConfig === 'string') {
     return _.get(specs, mappingConfig.replace(/^\//, '').split('/'));
   }
@@ -105,6 +66,15 @@ const engines = {
   yaml
 };
 
+interface GenerateProps {
+  encoders: any;
+  files: any;
+  meta: any;
+  schemas: any;
+  specs: any;
+  templates: any;
+}
+
 function generate({
   encoders = {},
   files = {},
@@ -112,7 +82,7 @@ function generate({
   schemas = {},
   specs: tempSpecs = {},
   templates = {}
-}) {
+}: GenerateProps) {
   let newSpecs = { ...tempSpecs };
   if (meta.specs) {
     Object.keys(meta.specs).forEach((specPath) => {
@@ -143,7 +113,47 @@ function generate({
       return;
     }
 
-    const validateInput = validator(inputSchema);
+    const validateInput = validator({
+      type: 'object',
+      properties: {
+        encoder: {
+          type: 'string'
+        },
+        engine: {
+          required: true,
+          type: 'string'
+        },
+        filename: {
+          type: ['object', 'string'],
+          oneOf: [],
+          properties: {
+            engine: {
+              type: 'string'
+            },
+            mapping: {
+              type: ['object', 'string']
+            },
+            template: {
+              type: 'string'
+            }
+          }
+        },
+        iterator: {
+          type: 'string'
+        },
+        mapping: {
+          type: ['object', 'string'],
+          oneOf: []
+        },
+        schema: {
+          type: ['object', 'string'],
+          oneOf: []
+        },
+        template: {
+          type: 'string'
+        }
+      }
+    });
     const inputIsValid = validateInput(file);
     if (!inputIsValid) {
       const field = validateInput.errors[0].field;

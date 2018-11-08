@@ -112,7 +112,7 @@ function anyHelper(...args) {
   }
 }
 
-function caseHelper(val, type, opts) {
+function caseHelper(val, type) {
   const cases = [
     'camel',
     'constant',
@@ -300,16 +300,16 @@ function jsonHelper(data = {}, indentionStart = 1, parser = 'javascript') {
   const punctuationParsers = {
     javascript: {
       key: (key) => {
-        if (/^[a-z0-9_]+$/.test(key)) {
+        if (/[^a-z0-9_]/i.test(key)) {
           return "'";
         }
         return '';
       },
       value: (value) => {
-        if (/\$\{[a-z]+\}/.test(value)) {
-          return '`'
+        if (/\$\{[a-z]+\}/i.test(value)) {
+          return '`';
         }
-        return "'"
+        return "'";
       },
       objectPrefix: '{',
       objectSuffix: '}'
@@ -396,7 +396,8 @@ function jsonHelper(data = {}, indentionStart = 1, parser = 'javascript') {
         json += render(data[key], indention + 1);
       } else if (data[key] !== key) {
         const valuePunctuation = punctuation.value(data[key]);
-        json += `${valuePunctuation}${data[key]}${valuePunctuation}`;
+        const escapedStr = data[key].replace(new RegExp(`${valuePunctuation}`, 'g'), `\\${valuePunctuation}`);  
+        json += `${valuePunctuation}${escapedStr}${valuePunctuation}`;
       }
       n++;
     }
@@ -411,7 +412,7 @@ function jsonHelper(data = {}, indentionStart = 1, parser = 'javascript') {
 }
 
 function jsxHelper(elements, indentionStart, additionalAttributes = []) {
-  function render(renderElements, indention, firstIndention, elementName) {
+  function render(renderElements, indention, firstIndention?, elementName?) {
     if (!renderElements || (!isObject(renderElements) && !isArray(renderElements))) {
       return;
     }
@@ -774,6 +775,14 @@ const swiftColors = {
   white: 'UIColor.white',
   yellow: 'UIColor.yellow'
 };
+function getSwiftColors(name, value, type, suffix, prop) {
+  if (typeof value === 'object') {
+    return `${name}${suffix}.${prop} = UIColor(red: ${value.red.toFixed(1)}/255.0, green: ${value.green.toFixed(1)}/255.0, blue: ${value.blue.toFixed(1)}/255.0, alpha: ${value.alpha.toFixed(1)})`;
+  } else if (swiftColors[value]) {
+    return `${name}${suffix}.${prop} = ${swiftColors[value]}`;
+  }
+  return `${name}${suffix}.${prop} = UIColor.${value}`;
+}
 const swiftValues = {
   action: (name, value, type, suffix) => {
     return `${name}${suffix}.addTarget(self, action: #selector(${value}), for: .touchUpInside)`;
@@ -789,13 +798,13 @@ const swiftValues = {
     sentences: '.sentences',
     words: '.words'
   },
-  backgroundColor: swiftColors,
+  backgroundColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'backgroundColor'),
   baselineAdjustment: {
     alignBaselines: '.alignBaselines',
     alignCenters: '.alignCenters',
     none: '.none'
   },
-  barTintColor: swiftColors,
+  barTintColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'barTintColor'),
   borderStyle: {
     bezel: '.bezel',
     line: '.line',
@@ -817,7 +826,6 @@ const swiftValues = {
     topLeft: '.topLeft',
     topRight: '.topRight'
   },
-  currentPageIndicatorTintColor: swiftColors,
   lineBreakMode: {
     byCharWrapping: '.byCharWrapping',
     byClipping: '.byClipping',
@@ -867,7 +875,7 @@ const swiftValues = {
     });
     return result;
   },
-  currentPageIndicatorTintColor: swiftColors,
+  currentPageIndicatorTintColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'currentPageIndicatorTintColor'),
   font: (name, value, type, suffix) => {
     return `${name}${suffix}.font = UIFont.${value.type}Font(ofSize: ${value.pointSize})`;
   },
@@ -896,7 +904,7 @@ const swiftValues = {
     });
     return result;
   },
-  pageIndicatorTintColor: swiftColors,
+  pageIndicatorTintColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'pageIndicatorTintColor'),
   refreshControl: (name, value, type, suffix) => {
     let result = `let ${name}${suffix}RefreshControl = UIRefreshControl()\n`;
     result += `${name}${suffix}RefreshControl.addTarget(self, action: #selector(${value.action}), for: .valueChanged)\n`;
@@ -909,6 +917,12 @@ const swiftValues = {
       result += `${name}${suffix}.register(${value[id]}.self, forCellWithReuseIdentifier: "${id}")`;
     });
     return result;
+  },
+  selectionStyle: {
+    blue: '.blue',
+    default: '.default',
+    gray: '.gray',
+    none: '.none'
   },
   separatorStyle: (name, value, type, suffix) => {
     return `${name}${suffix}.separatorStyle = .${value}`;
@@ -932,15 +946,15 @@ const swiftValues = {
     natural: '.natural',
     right: '.right'
   },
-  textColor: swiftColors,
-  tintColor: swiftColors,
+  textColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'textColor'),
+  tintColor: (name, value, type, suffix) => getSwiftColors(name, value, type, suffix, 'tintColor'),
   title: (name, value, type, suffix) => {
     return `${name}${suffix}.setTitle("${value}", for: .normal)`;
   },
   titleColor: (name, value, type, suffix) => {
     return `${name}${suffix}.setTitleColor(${swiftColors[value]}, for: .normal)`;
   },
-  titleTextAttributes: (name, value, type, suffix) => {
+  titleTextAttributes: (name, value, type, suffix, parentView) => {
     let result = `${name}${suffix}.titleTextAttributes = [\n`;
     const values = Object.keys(value);
     values.forEach((key, index) => {

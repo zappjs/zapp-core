@@ -83,6 +83,8 @@ export default function engine(specs, template) {
   Handlebars.registerHelper('neAll', neAllHelper);
   Handlebars.registerHelper('neAny', neAnyHelper);
   Handlebars.registerHelper('none', noneHelper);
+  Handlebars.registerHelper('repeat', repeatHelper);
+  Handlebars.registerHelper('subtract', subtractHelper);
   Handlebars.registerHelper('some', someHelper);
   Handlebars.registerHelper('str', strHelper);
   Handlebars.registerHelper('substr', substrHelper);
@@ -727,6 +729,14 @@ function noneHelper() {
   } else {
     return opts.inverse(this);
   }
+}
+
+function repeatHelper(str: string, count: number) {
+  return str.repeat(count);
+}
+
+function subtractHelper(num1: number, num2: number) {
+  return num1 - num2;
 }
 
 function someHelper() {

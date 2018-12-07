@@ -20,7 +20,7 @@
     "uuid": "^3.3.2"
   },
   "scripts": {
-    "build": "rm -rf ./dist ; tsc",
+    "build": "tsc",
     "test": "mocha -r ts-node/register ./src/**/*.spec.ts",
     "watch": "tsc -w"
   }

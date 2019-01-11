@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Case from 'case';
 import Handlebars from 'handlebars';
+import * as pluralize from 'pluralize';
 import * as uuidv5 from 'uuid/v5';
 
 function getType(val) {
@@ -83,6 +84,7 @@ export default function engine(specs, template) {
   Handlebars.registerHelper('neAll', neAllHelper);
   Handlebars.registerHelper('neAny', neAnyHelper);
   Handlebars.registerHelper('none', noneHelper);
+  Handlebars.registerHelper('plural', pluralHelper);
   Handlebars.registerHelper('repeat', repeatHelper);
   Handlebars.registerHelper('subtract', subtractHelper);
   Handlebars.registerHelper('some', someHelper);
@@ -729,6 +731,10 @@ function noneHelper() {
   } else {
     return opts.inverse(this);
   }
+}
+
+function pluralHelper(val) {
+  return pluralize(val);
 }
 
 function repeatHelper(str: string, count: number) {

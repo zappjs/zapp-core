@@ -4,6 +4,8 @@ import Handlebars from 'handlebars';
 import * as pluralize from 'pluralize';
 import * as uuidv5 from 'uuid/v5';
 
+import { tsInterface } from '../shared';
+
 function getType(val) {
   if (val === undefined) {
     return 'Undefined';
@@ -93,10 +95,13 @@ export default function engine(specs, template) {
   Handlebars.registerHelper('swiftCreate', swiftCreateHelper);
   Handlebars.registerHelper('swiftProperties', swiftPropertiesHelper);
   Handlebars.registerHelper('swiftValue', swiftValueHelper);
+  Handlebars.registerHelper('tsInterface', tsInterfaceHelper);
   Handlebars.registerHelper('typeof', typeofHelper);
   Handlebars.registerHelper('uri', uriHelper);
+  
   const compiler = Handlebars.compile(template);
   const result = compiler(specs);
+
   return result;
 }
 
@@ -1131,6 +1136,11 @@ function swiftPropertiesHelper(name, values, type = 'view', suffix = '', isContr
     })
   }
   return swiftProperties;
+}
+
+function tsInterfaceHelper(name: string, obj) {
+  const result = tsInterface(name, obj);
+  return result;
 }
 
 function typeofHelper(a, b, opts) {

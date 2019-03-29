@@ -28,9 +28,17 @@ export function tsInterface(name: string, schemas, indent = '  ') {
         const propOptional = prop.required ? '' : '?';
         let propType = 'any';
         if (prop.type === 'array') {
-          propType = 'any[]';
+          if (prop.items) {
+            if (prop.items.type === 'object') {
+              propType = `I${Case.pascal(name)}${Case.pascal(propName)}[]`;
+            } else {
+              propType = `${prop.type}[]`;
+            }
+          } else {
+            propType = 'any[]'
+          }
         } else if (prop.type === 'object') {
-          propType = 'any';
+          propType = `I${Case.pascal(name)}${Case.pascal(propName)}`;
         } else {
           propType = prop.type;
         }
@@ -38,6 +46,23 @@ export function tsInterface(name: string, schemas, indent = '  ') {
       });
     }
   }
-  interfaceString +=  `}\n`;
+  interfaceString +=  `}`;
+
+  // sub interfaces
+  if (schemas.type === 'object') {
+    if (schemas.properties) {
+      Object.keys(schemas.properties).forEach((propName) => {
+        const prop = schemas.properties[propName];
+        if (prop.type === 'array' && prop.items) {
+          interfaceString +=  '\n\n';
+          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop.items, indent);
+        } else if (prop.type === 'object') {
+          interfaceString +=  '\n\n';
+          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop, indent);
+        }
+      });
+    }
+  }
+
   return interfaceString;
 }

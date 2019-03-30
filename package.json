@@ -1,7 +1,7 @@
 {
   "name": "@zappjs/core",
   "description": "open source code generator",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": "dist/zapp.js",
   "devDependencies": {
     "@types/mocha": "^5.2.5",

@@ -1138,8 +1138,14 @@ function swiftPropertiesHelper(name, values, type = 'view', suffix = '', isContr
   return swiftProperties;
 }
 
-function tsInterfaceHelper(name: string, obj) {
-  const result = tsInterface(name, obj);
+function tsInterfaceHelper(name: string, schemas, indent = '  ', forceType = '') {
+  if (typeof indent !== 'string') {
+    indent = '  ';
+  }
+  if (typeof forceType !== 'string') {
+    forceType = '  ';
+  }
+  const result = tsInterface(name, schemas, indent, forceType);
   return result;
 }
 

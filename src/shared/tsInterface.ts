@@ -1,6 +1,6 @@
 import * as Case from 'case';
 
-export function tsInterface(name: string, schemas, indent = '  ') {
+export function tsInterface(name: string, schemas, indent = '  ', forceType = '') {
   let interfaceString = '';
   interfaceString += `export interface I${Case.pascal(name)} {\n`
   if (schemas.type === 'function') {
@@ -9,7 +9,12 @@ export function tsInterface(name: string, schemas, indent = '  ') {
       Object.keys(schemas.properties).forEach((propName) => {
         const prop = schemas.properties[propName];
         const propOptional = prop.required ? '' : '?';
-        const propType = prop.type || 'any';
+        let propType = 'any';
+        if (forceType) {
+          propType = forceType;
+        } else if (prop.type) {
+          propType = prop.type;
+        }
         interfaceString += `${propName}${propOptional}: ${Case.pascal(propType)}`;
       });
     }
@@ -39,6 +44,8 @@ export function tsInterface(name: string, schemas, indent = '  ') {
           }
         } else if (prop.type === 'object') {
           propType = `I${Case.pascal(name)}${Case.pascal(propName)}`;
+        } else if (forceType) {
+          propType = forceType;
         } else {
           propType = prop.type;
         }
@@ -55,10 +62,10 @@ export function tsInterface(name: string, schemas, indent = '  ') {
         const prop = schemas.properties[propName];
         if (prop.type === 'array' && prop.items) {
           interfaceString +=  '\n\n';
-          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop.items, indent);
+          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop.items, indent, forceType);
         } else if (prop.type === 'object') {
           interfaceString +=  '\n\n';
-          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop, indent);
+          interfaceString += tsInterface(`${Case.pascal(name)}${Case.pascal(propName)}`, prop, indent, forceType);
         }
       });
     }

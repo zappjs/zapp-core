@@ -37,7 +37,7 @@ export function tsInterface(name: string, schemas, indent = '  ', forceType = ''
             if (prop.items.type === 'object') {
               propType = `I${Case.pascal(name)}${Case.pascal(propName)}[]`;
             } else {
-              propType = `${prop.type}[]`;
+              propType = `${prop.items.type}[]`;
             }
           } else {
             propType = 'any[]'

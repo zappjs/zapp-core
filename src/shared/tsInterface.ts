@@ -12,6 +12,12 @@ export function tsInterface(name: string, schemas, indent = '  ', forceType = ''
         let propType = 'any';
         if (forceType) {
           propType = forceType;
+        } else if (prop.enum) {
+          if (prop.type === 'string') {
+            propType = prop.enum.map((e: string) => `'${e}'`).join(' | ');
+          } else {
+            propType = prop.enum.join(' | ');
+          }
         } else if (prop.type) {
           propType = prop.type;
         }
@@ -46,6 +52,12 @@ export function tsInterface(name: string, schemas, indent = '  ', forceType = ''
           propType = `I${Case.pascal(name)}${Case.pascal(propName)}`;
         } else if (forceType) {
           propType = forceType;
+        } else if (prop.enum) {
+          if (prop.type === 'string') {
+            propType = prop.enum.map((e: string) => `'${e}'`).join(' | ');
+          } else {
+            propType = prop.enum.join(' | ');
+          }
         } else {
           propType = prop.type;
         }

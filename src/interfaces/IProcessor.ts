@@ -1,3 +1,3 @@
-export interface Processor {
+export interface IProcessor {
   (output: string): string;
 }

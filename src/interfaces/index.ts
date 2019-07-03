@@ -1,3 +1,3 @@
-export * from './Engine';
-export * from './Generator';
-export * from './Processor';
+export * from './IEngine';
+export * from './IGenerator';
+export * from './IProcessor';

@@ -1,12 +1,12 @@
-import { Engine, Processor } from '../interfaces';
+import { IEngine, IProcessor } from '../interfaces';
 
 interface Generate {
   (config: GenerateConfig): string;
 }
 
 interface GenerateConfig {
-  engine: Engine;
-  processor?: Processor;
+  engine: IEngine;
+  processor?: IProcessor;
   schema?: object;
   spec?: object;
   template?: string;

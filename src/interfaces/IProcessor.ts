@@ -1,3 +1,3 @@
 export interface IProcessor {
-  (output: string): string;
+  (output: string): Promise<string>;
 }

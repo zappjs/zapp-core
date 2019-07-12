@@ -1,3 +1,3 @@
 export interface IGenerator<P = {}> {
-  (spec: P): string;
+  (spec: P): Promise<string>;
 }

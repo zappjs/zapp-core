@@ -1,3 +1,3 @@
 export interface IEngine<P = {}> {
-  (spec: P, template?: string): string;
+  (spec: P, template?: string): Promise<string>;
 }
